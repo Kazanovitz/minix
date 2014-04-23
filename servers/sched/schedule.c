@@ -7,6 +7,7 @@
  *   do_nice		  Request to change the nice level on a proc
  *   init_scheduling      Called from main.c to set up/prepare scheduling
  */
+#include <minix/syslib.h>
 #include "sched.h"
 #include "schedproc.h"
 #include <assert.h>
@@ -45,6 +46,9 @@ static void balance_queues(struct timer *tp);
 
 /* processes created by RS are sysytem processes */
 #define is_system_proc(p)	((p)->parent == RS_PROC_NR)
+
+#define PROCESS_IN_USER_Q(x) ((x)->priority >= MAX_USER_Q && \
+	(x)->priority <= MIN_USER_Q)
 
 static unsigned cpu_proc[CONFIG_MAX_CPUS];
 
@@ -106,6 +110,11 @@ int do_noquantum(message *m_ptr)
 	if ((rv = schedule_process_local(rmp)) != OK) {
 		return rv;
 	}
+
+	if((rv = do_lottery(m_ptr)) != OK){
+		return rv;
+	}
+
 	return OK;
 }
 
@@ -116,6 +125,7 @@ int do_stop_scheduling(message *m_ptr)
 {
 	register struct schedproc *rmp;
 	int proc_nr_n;
+	int rv;
 
 	/* check who can send you requests */
 	if (!accept_message(m_ptr))
@@ -132,6 +142,9 @@ int do_stop_scheduling(message *m_ptr)
 	cpu_proc[rmp->cpu]--;
 #endif
 	rmp->flags = 0; /*&= ~IN_USE;*/
+
+	rv = do_lottery(m_ptr);
+	if( rv != OK ) return rv; 
 
 	return OK;
 }
@@ -160,6 +173,7 @@ int do_start_scheduling(message *m_ptr)
 	rmp = &schedproc[proc_nr_n];
 
 	/* Populate process slot */
+	rmp->num_tickets  = 5; 
 	rmp->endpoint     = m_ptr->SCHEDULING_ENDPOINT;
 	rmp->parent       = m_ptr->SCHEDULING_PARENT;
 	rmp->max_priority = (unsigned) m_ptr->SCHEDULING_MAXPRIO;
@@ -276,12 +290,14 @@ int do_nice(message *m_ptr)
 		return EINVAL;
 	}
 
-	/* Store old values, in case we need to roll back the changes */
+	 Store old values, in case we need to roll back the changes 
 	old_q     = rmp->priority;
 	old_max_q = rmp->max_priority;
 
 	/* Update the proc entry and reschedule the process */
-	rmp->max_priority = rmp->priority = new_q;
+	//rmp->max_priority = rmp->priority = new_q;
+	rmp->priority     = USER_Q;
+	rmp->num_tickets  = random() % 100 + 1;
 
 	if ((rv = schedule_process_local(rmp)) != OK) {
 		/* Something went wrong when rescheduling the process, roll
@@ -290,8 +306,110 @@ int do_nice(message *m_ptr)
 		rmp->max_priority = old_max_q;
 	}
 
-	return rv;
+	//return rv;
+	return do_lottery(m_ptr);
+
+
+		struct schedproc *rmp;
+	int rv;
+	int proc_nr_n;
+	unsigned new_q, old_q, old_max_q;
+
+	/* check who can send you requests */
+	if (!accept_message(m_ptr))
+		return EPERM;
+
+	if (sched_isokendpt(m_ptr->SCHEDULING_ENDPOINT, &proc_nr_n) != OK) {
+		printf("SCHED: WARNING: got an invalid endpoint in OOQ msg "
+		"%ld\n", m_ptr->SCHEDULING_ENDPOINT);
+		return EBADEPT;
+	}
+
+	rmp = &schedproc[proc_nr_n];
+	new_q = (unsigned) m_ptr->SCHEDULING_MAXPRIO;
+	if (new_q >= NR_SCHED_QUEUES) {
+		return EINVAL;
+	}
+
+	/* Store old values, in case we need to roll back the changes */
+	old_q     = rmp->priority;
+	old_max_q = rmp->max_priority;
+
+	/* Update the proc entry and reschedule the process */
+	//rmp->max_priority = rmp->priority = new_q;
+	rmp->priority = USER_Q;
+
+	//printf("-----OLD ticket value %d  ---   ", rmp->num_tickets);
+	rmp->num_tickets = random() % 100 + 1;
+	//printf("-----NEW ticket value %d \n", rmp->num_tickets);
+
+
+	if ((rv = schedule_process_local(rmp)) != OK) {
+		/* Something went wrong when rescheduling the process, roll
+		 * back the changes to proc struct */
+		rmp->priority     = old_q;
+		rmp->max_priority = old_max_q;
+	}
+
+	//return rv;
+	return do_lottery(m_ptr);
 }
+
+/*===========================================================================*
+ *				do_nice					     *
+ *===========================================================================*/
+int do_lottery(message *m_ptr)
+{
+	// struct schedproc *rmp;
+	// int rv;
+	// int proc_nr_n, total_tickets;
+	// unsigned new_q, old_q, old_max_q;
+
+	// //get total number of tickets currently
+	// 	for (proc_nr=0, rmp=schedproc; proc_nr < NR_PROCS; proc_nr++, rmp++) {
+	// 	if (rmp->flags & IN_USE) {
+	// 		if(is_user_proc(rmp)){
+
+	// 		}
+
+	// 	}
+	// }
+
+	int proc_nr, old_priority, rv, luckyNumber, flag = -1, num_tickets = 0;
+	struct schedproc *rmp;
+
+	for(proc_nr=0, rmp=schedproc; proc_nr < NR_PROCS; proc_nr++, rmp++){
+		if((rmp->flags & IN_USE) && PROCESS_IN_USER_Q(rmp)){
+			if(USER_Q == rmp->priority){
+				num_tickets += rmp->num_tickets;
+			}
+		}
+	}
+
+	//printf("Total number of tickets before choosing luckyNumber: %d\n", num_tickets);
+	luckyNumber = num_tickets ? random() % num_tickets : 0;
+	//printf("luckyNumber: %d\n", luckyNumber);
+	for (proc_nr=0, rmp=schedproc; proc_nr < NR_PROCS; proc_nr++, rmp++) {
+		if((rmp->flags & IN_USE) && PROCESS_IN_USER_Q(rmp) &&
+				USER_Q == rmp->priority) {
+			old_priority = rmp->priority;
+			if(luckyNumber >= 0){
+				luckyNumber -= rmp->num_tickets;
+				if(luckyNumber < 0){
+					rmp->priority = MAX_USER_Q;
+					flag = OK;
+				}
+			}
+			if(old_priority != rmp->priority){
+				schedule_process_local(rmp);
+			}
+		}
+	}
+	return num_tickets ? flag : OK;
+
+}
+
+
 
 /*===========================================================================*
  *				schedule_process			     *

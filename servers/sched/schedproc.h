@@ -26,6 +26,7 @@ EXTERN struct schedproc {
 	unsigned flags;		/* flag bits */
 
 	/* User space scheduling */
+	unsigned num_tickets;
 	unsigned max_priority;	/* this process' highest allowed priority */
 	unsigned priority;		/* the process' current priority */
 	unsigned time_slice;		/* this process's time slice */
