@@ -1,4 +1,3 @@
-# Will i be able to see this is branch master?
 # Makefile for zlib 
 # Copyright (C) 1995-2005 Jean-loup Gailly.
 # For conditions of distribution and use, see copyright notice in zlib.h
