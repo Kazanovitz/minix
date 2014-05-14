@@ -173,4 +173,7 @@
 #define EDEADEPT     (_SIGN 302 )  /* specified endpoint is not alive */
 #define EBADCPU	     (_SIGN 303 )  /* requested CPU does not work */
 
+/* Semaphore error defining semaphore is currently in use */
+ #define EINUSE 	(_SIGN 304 ) 
+
 #endif /* !_SYS_ERRNO_H_ */
