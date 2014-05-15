@@ -1,4 +1,4 @@
-# /etc/rc - System startup script run by init before going multiuser.
+# /etc/rc - System startup script run by init before going multiuser mode.
 
 exec >/dev/log
 exec 2>/dev/log
