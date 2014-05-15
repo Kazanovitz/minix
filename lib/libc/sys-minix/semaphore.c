@@ -7,16 +7,23 @@
 #include <minix/com.h>
 #include <minix/rs.h>
 
+static int get_sem_endpt(endpoint_t *pt)
+{
+	return minix_rs_lookup("sema", pt);
+}
 
 int sem_init(int start_value){
 
 	message m;
 	int type;
-	type = minix_rs_lookup("sema", SEMA_PROC_NR);
-	m.m_type = type;
-	m.m1_i1 = start_value;
+	endpoint_t sem_pt;
 
-  return(_syscall(SEMA_PROC_NR, type, &m));
+	// type = minix_rs_lookup("sema", sem_pt);
+	// m.m_type = type;
+	m.SEM_INIT_START_VALUE = start_value;
+	
+
+  return(_syscall(sem_pt, SEM_INIT, &m));
 
 }
 
@@ -24,11 +31,12 @@ int sem_down(int semaphore_number){
 
 	message m;
 	int type;
-	type = minix_rs_lookup("sema", SEMA_PROC_NR);
-	m.m_type = type;
-	m.m1_i2 = semaphore_number;
+	// type = minix_rs_lookup("sema", sem_pt);
+	// m.m_type = type;
+		
+	m.SEM_DOWN_SEM_NUM = semaphore_number;
 
-  return(_syscall(SEMA_PROC_NR, type, &m));
+  return(_syscall(sem_pt, SEM_DOWN, &m));
 
 }
 
@@ -37,11 +45,12 @@ int sem_up(int semaphore_number){
 
 	message m;
 	int type;
-	type = minix_rs_lookup("sema", SEMA_PROC_NR);
-	m.m_type = type;
-	m.m1_i2 = semaphore_number;
+	// type = minix_rs_lookup("sema", sem_pt);
+	// m.m_type = type;
+		
+	m.SEM_UP_SEM_NUM = semaphore_number;
 
-  return(_syscall(SEMA_PROC_NR, type, &m));
+  return(_syscall(sem_pt, SEM_UP, &m));
 
 }
 
@@ -49,10 +58,11 @@ int sem_release(int semaphore){
 
 	message m;
 	int type;
-	type = minix_rs_lookup("sema", SEMA_PROC_NR);
-	m.m_type = type;
-	m.m1_i3 = semaphore;
+	// type = minix_rs_lookup("sema", sem_pt);
+	// m.m_type = type;
+		
+	m.SEM_RELEASE_SEMAPHORE = semaphore;
 
-  return(_syscall(SEMA_PROC_NR, type, &m));
+  return(_syscall(sem_pt, SEM_RELEASE, &m));
 
 }
