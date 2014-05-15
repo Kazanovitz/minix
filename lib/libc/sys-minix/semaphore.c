@@ -12,7 +12,7 @@ int sem_init(int start_value){
 
 	message m;
 	int type;
-	type = minix_rs_lookup("ipc", SEMA_PROC_NR);
+	type = minix_rs_lookup("sema", SEMA_PROC_NR);
 	m.m_type = type;
 	m.m1_i1 = start_value;
 
@@ -24,7 +24,7 @@ int sem_down(int semaphore_number){
 
 	message m;
 	int type;
-	type = minix_rs_lookup("ipc", SEMA_PROC_NR);
+	type = minix_rs_lookup("sema", SEMA_PROC_NR);
 	m.m_type = type;
 	m.m1_i2 = semaphore_number;
 
@@ -37,7 +37,7 @@ int sem_up(int semaphore_number){
 
 	message m;
 	int type;
-	type = minix_rs_lookup("ipc", SEMA_PROC_NR);
+	type = minix_rs_lookup("sema", SEMA_PROC_NR);
 	m.m_type = type;
 	m.m1_i2 = semaphore_number;
 
@@ -49,7 +49,7 @@ int sem_release(int semaphore){
 
 	message m;
 	int type;
-	type = minix_rs_lookup("ipc", SEMA_PROC_NR);
+	type = minix_rs_lookup("sema", SEMA_PROC_NR);
 	m.m_type = type;
 	m.m1_i3 = semaphore;
 
