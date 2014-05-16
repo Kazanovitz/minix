@@ -28,6 +28,7 @@ int main(void)
 	int rv;
 	int s;
 
+	printf("SCHEDULER NOW RUNNING");
 	/* SEF local startup. */
 	sef_local_startup();
 

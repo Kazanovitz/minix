@@ -25,6 +25,7 @@ int main(void)
 	int rv;
 	int s;
 
+	printf("Semafor service is a running");
 	/* SEF local startup. */
 	sef_local_startup();
 
