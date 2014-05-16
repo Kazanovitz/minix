@@ -80,9 +80,9 @@
 #define VM_PROC_NR   ((endpoint_t) 8)   /* memory server */
 #define PFS_PROC_NR  ((endpoint_t) 9)  /* pipe filesystem */
 #define SCHED_PROC_NR ((endpoint_t) 10)	/* scheduler */
-#define SEMA_PROC_NR ((endpoint_t) 11 ) /*  Semaphore */ 
+// #define SEMA_PROC_NR ((endpoint_t) 11 ) /*  Semaphore */ 
 
-#define LAST_SPECIAL_PROC_NR	12	/* An untyped version for
+#define LAST_SPECIAL_PROC_NR	11	/* An untyped version for
                                            computation in macros.*/
 #define INIT_PROC_NR ((endpoint_t) LAST_SPECIAL_PROC_NR)  /* init
                                                         -- goes multiuser */
@@ -1129,6 +1129,17 @@
 #	define SEMOP_ID		m2_i1
 #	define SEMOP_OPS	m2_l1
 #	define SEMOP_SIZE	m2_i2
+ /*defining semaphore messages */
+#define SEM_INIT 	(IPC_BASE+8)
+#	define SEM_INIT_START_VALUE m2_l1 
+#define SEM_DOWN 	(IPC_BASE+9)
+#	define SEM_DOWN_SEM_NUM m2_l1  
+#define SEM_UP	 	(IPC_BASE+10)
+#	define SEM_UP_SEM_NUM m2_l1 
+#define SEM_RELEASE 	(IPC_BASE+11)
+#	define SEM_RELEASE_SEMAPHORE m2_l1 
+
+
 
 /*===========================================================================*
  *                Messages for Scheduling				     *
