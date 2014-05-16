@@ -112,6 +112,7 @@ int do_sem_release(message *m){
 	else{
 		semas[sem_rel]->buffer = 0;
 		semas[sem_rel]->init = 0;
+		return OK;
 	}
 
 }

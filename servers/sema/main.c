@@ -6,14 +6,11 @@
  * here. Used from within schedproc.h */
 #define _MAIN
 
-#include "sched.h"
-#include "schedproc.h"
+#include "sema.h"
+prevSize = 0;
+ArraySize = 1000;
 
-/* Declare some local functions. */
-static void reply(endpoint_t whom, message *m_ptr);
-static void sef_local_startup(void);
-
-struct machine machine;		/* machine info */
+load_semas(prevSize, ArraySize);
 
 /*===========================================================================*
  *				main					     *
@@ -33,8 +30,8 @@ int main(void)
 
 	if (OK != (s=sys_getmachine(&machine)))
 		panic("couldn't get machine info: %d", s);
-	/* Initialize scheduling timers, used for running balance_queues */
-	init_scheduling();
+	
+
 
 	/* This is SCHED's main loop - get work and do it, forever and forever. */
 	while (TRUE) {
@@ -60,33 +57,19 @@ int main(void)
 		}
 
 		switch(call_nr) {
-		case SCHEDULING_INHERIT:
-		case SCHEDULING_START:
-			result = do_start_scheduling(&m_in);
+		case SEM_INIT:
+			result = do_sem_init(&m_in);
 			break;
-		case SCHEDULING_STOP:
-			result = do_stop_scheduling(&m_in);
+		case SEM_DOWN:
+			result = do_sem_down(&m_in);
 			break;
-		case SCHEDULING_SET_NICE:
-			result = do_nice(&m_in);
+		case SEM_UP:
+			result = do_sem_up(&m_in);
 			break;
-		case SCHEDULING_NO_QUANTUM:
-			/* This message was sent from the kernel, don't reply */
-			if (IPC_STATUS_FLAGS_TEST(ipc_status,
-				IPC_FLG_MSG_FROM_KERNEL)) {
-				if ((rv = do_noquantum(&m_in)) != (OK)) {
-					printf("SCHED: Warning, do_noquantum "
-						"failed with %d\n", rv);
-				}
-				continue; /* Don't reply */
-			}
-			else {
-				printf("SCHED: process %d faked "
-					"SCHEDULING_NO_QUANTUM message!\n",
-						who_e);
-				result = EPERM;
-			}
+		case SEM_RELEASE:
+			result = do_sem_release(&m_in);
 			break;
+
 		default:
 			result = no_sys(who_e, call_nr);
 		}

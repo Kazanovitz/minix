@@ -6,7 +6,6 @@ struct Semaphore;
 
 /* main.c */
 int main(void);
-void setreply(int proc_nr, int result); /// ???
 
 /* sema.c */
 void load_semas(int prevSize, int ArraySize);

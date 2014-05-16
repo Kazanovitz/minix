@@ -7,6 +7,8 @@
 #include <minix/com.h>
 #include <minix/rs.h>
 
+#define OK 0
+
 static int get_sem_endpt(endpoint_t *pt)
 {
 	return minix_rs_lookup("sema", pt);
