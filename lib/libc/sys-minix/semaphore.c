@@ -20,8 +20,11 @@ int sem_init(int start_value){
 	int type;
 	endpoint_t sem_pt;
 
-	// type = minix_rs_lookup("sema", sem_pt);
-	// m.m_type = type;
+	if( get_sem_endpt(&sem_pt) != OK){
+		errno = ENOSYS;
+		return -1;
+	}
+
 	m.SEM_INIT_START_VALUE = start_value;
 	
 
@@ -33,8 +36,13 @@ int sem_down(int semaphore_number){
 
 	message m;
 	int type;
-	// type = minix_rs_lookup("sema", sem_pt);
-	// m.m_type = type;
+
+	endpoint_t sem_pt;
+
+	if( get_sem_endpt(&sem_pt) != OK){
+		errno = ENOSYS;
+		return -1;
+	}
 		
 	m.SEM_DOWN_SEM_NUM = semaphore_number;
 
@@ -46,9 +54,12 @@ int sem_down(int semaphore_number){
 int sem_up(int semaphore_number){
 
 	message m;
-	int type;
-	// type = minix_rs_lookup("sema", sem_pt);
-	// m.m_type = type;
+	endpoint_t sem_pt;
+
+	if( get_sem_endpt(&sem_pt) != OK){
+		errno = ENOSYS;
+		return -1;
+	}
 		
 	m.SEM_UP_SEM_NUM = semaphore_number;
 
@@ -59,9 +70,12 @@ int sem_up(int semaphore_number){
 int sem_release(int semaphore){
 
 	message m;
-	int type;
-	// type = minix_rs_lookup("sema", sem_pt);
-	// m.m_type = type;
+	endpoint_t sem_pt;
+
+	if( get_sem_endpt(&sem_pt) != OK){
+		errno = ENOSYS;
+		return -1;
+	}
 		
 	m.SEM_RELEASE_SEMAPHORE = semaphore;
 

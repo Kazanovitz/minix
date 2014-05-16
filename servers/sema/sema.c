@@ -51,11 +51,11 @@ int do_sem_init(message *m){
 		if(semas[i]->init != 1){
 			semas[i]->init = 1;
 			semas[i]->buffer = m->SEM_INIT_START_VALUE;
-			return i++; //needs to represent the next available semaphore
+			return i; //needs to represent  available semaphore
 		}
 	}
 
-	return i++; //tI don't think it will ever get here?
+	return i; //tI don't think it will ever get here?
 
 }
 
@@ -71,8 +71,10 @@ int do_sem_down(message *m){
 		return OK; // change this to zero if it's not initialized
 }
 	if(semas[sem_num]->buffer < 0){
+		//dont let it go negative
+		semas[sem_num]->buffer = 0;
 		enq(semas[sem_num]->q, m->m_source);
-		return 1; //TODO I don't know wha to return here
+		return SUSPEND; //TODO I don't know wha to return here maybe do SUSPEND
 	}
 
 }
@@ -80,18 +82,21 @@ int do_sem_down(message *m){
 int do_sem_up(message *m){
 	int sem_num = m->SEM_DOWN_SEM_NUM;
 	
+	//check if semaphore exists
+
 	if(semas[sem_num]->init == 0){
 		return EINVAL;
 	}
-
+//check if trying to go higher than value of semaphore
 	semas[sem_num]->buffer++;
 
 	if(que_size(semas[sem_num]->q) > 0){
 		//semas[sem_num]->buffer--;
 		message mess;
-		mess.m_type = OK;
+		// mess.m_type = OK;
 		mess.m_source = deq(semas[sem_num]->q);
-		sendnb(mess.m_source, &mess);
+		// sendnb(mess.m_source, &mess);
+		do_sem_down(m)
 	}
 
 	return OK;
