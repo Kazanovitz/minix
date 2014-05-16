@@ -1,7 +1,6 @@
 #include "sema.h"
-#include <machine/archtypes.h>
+// #include <machine/archtypes.h>
 #include <sys/resource.h> /* for PRIO_MAX & PRIO_MIN */
-#include "kernel/proc.h" /* for queue constants */
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -50,7 +49,7 @@ void enq(struct Que *q, int proc){
 int deq(struct Que *q){
 	int pid;
 
-	if(p->head == NULL){
+	if(q->head == NULL){
         printf("\n Error: Trying to display elements from empty queue");	
 		return -1;
 	}

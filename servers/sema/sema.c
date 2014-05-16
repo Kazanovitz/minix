@@ -1,9 +1,9 @@
-#include "proto.h"
 #include <assert.h>
 #include <minix/com.h>
-#include <machine/archtypes.h>
-#include "kernel/proc.h"
+// #include <machine/archtypes.h>
 #include "sema.h"
+
+
 
 struct Semaphore{
 	int init;
@@ -16,14 +16,14 @@ int ArraySize, prevSize;
 int s;
 prevSize = 0;
 ArraySize = 1000;
-struct Semaphore *semas[ArraySize];
+struct Semaphore* semas[1000];
 
 //Initialize empty sempahores ---> don't forget to laod semas in main
 void load_semas(int prevSize, int ArraySize){	
-	for(k=prevSize; k<ArraySize; k++){ //need prev size so you don't overwrite the first batch of Semas
-		semas[k] = (struct Semaphore*) malloc(sizeof(struct Semaphore));
-		semas[k]->q = make_queue();
-		semas[k]->init = 0;
+	for(s=prevSize; s<ArraySize; s++){ //need prev size so you don't overwrite the first batch of Semas
+		semas[s] = (struct Semaphore*) malloc(sizeof(struct Semaphore));
+		semas[s]->q = make_que();
+		semas[s]->init = 0;
 	}
 }
 
@@ -43,7 +43,7 @@ int do_sem_init(message *m){
 		if(i == ArraySize){
 			prevSize = ArraySize; 
 			ArraySize = ArraySize *2; // inscreasing global
-			semas = (struct Semaphore*) realloc(semas, ArraySize * sizeof(struct Semaphore*)); // actually allocation more space in array
+			*semas = (struct Semaphore*) realloc(semas, ArraySize * sizeof(struct Semaphore*)); // actually allocation more space in array
 			load_semas(prevSize, ArraySize);
 			
 		}
@@ -96,7 +96,7 @@ int do_sem_up(message *m){
 		// mess.m_type = OK;
 		mess.m_source = deq(semas[sem_num]->q);
 		// sendnb(mess.m_source, &mess);
-		do_sem_down(m)
+		do_sem_down(m);
 	}
 
 	return OK;

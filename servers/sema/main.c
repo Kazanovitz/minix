@@ -7,10 +7,21 @@
 #define _MAIN
 
 #include "sema.h"
-prevSize = 0;
-ArraySize = 1000;
 
-load_semas(prevSize, ArraySize);
+
+
+
+/*===========================================================================*
+ *				reply					     *
+ *===========================================================================*/
+static void reply(endpoint_t who_e, message *m_ptr)
+{
+	int s = send(who_e, m_ptr);    /* send the message */
+	if (OK != s)
+		printf("SCHED: unable to send reply to %d: %d\n", who_e, s);
+}
+
+
 
 /*===========================================================================*
  *				main					     *
@@ -22,16 +33,16 @@ int main(void)
 	int call_nr;	/* system call number */
 	int who_e;	/* caller's endpoint */
 	int result;	/* result to system call */
-	int rv;
-	int s;
+
+	int prevSize = 0;
+	int ArraySize = 1000;
 
 	printf("Semafor service is a running");
 	/* SEF local startup. */
-	sef_local_startup();
+	sef_startup();
 
-	if (OK != (s=sys_getmachine(&machine)))
-		panic("couldn't get machine info: %d", s);
-	
+
+	load_semas(prevSize, ArraySize);
 
 
 	/* This is SCHED's main loop - get work and do it, forever and forever. */
@@ -71,8 +82,6 @@ int main(void)
 			result = do_sem_release(&m_in);
 			break;
 
-		default:
-			result = no_sys(who_e, call_nr);
 		}
 
 sendreply:
@@ -85,25 +94,4 @@ sendreply:
 	return(OK);
 }
 
-/*===========================================================================*
- *				reply					     *
- *===========================================================================*/
-static void reply(endpoint_t who_e, message *m_ptr)
-{
-	int s = send(who_e, m_ptr);    /* send the message */
-	if (OK != s)
-		printf("SCHED: unable to send reply to %d: %d\n", who_e, s);
-}
 
-/*===========================================================================*
- *			       sef_local_startup			     *
- *===========================================================================*/
-static void sef_local_startup(void)
-{
-	/* No init callbacks for now. */
-	/* No live update support for now. */
-	/* No signal callbacks for now. */
-
-	/* Let SEF perform startup. */
-	sef_startup();
-}
