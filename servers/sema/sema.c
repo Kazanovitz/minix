@@ -70,7 +70,6 @@ int do_sem_down(message *m){
 
 	else if(semas[sem_num]->buffer >= 0){
 		semas[sem_num]->buffer--; ///decrement
-		return OK; // change this to zero if it's not initialized
 }
 	if(semas[sem_num]->buffer < 0){
 		//dont let it go negative
@@ -78,14 +77,21 @@ int do_sem_down(message *m){
 		enq(semas[sem_num]->q, m->m_source);
 		return SUSPEND; //TODO I don't know wha to return here maybe do SUSPEND
 	}
+	return OK; // change this to zero if it's not initialized
 
 }
 
 int do_sem_up(message *m){
 	printf("sem up dawg\n");
 	int sem_num = m->SEM_DOWN_SEM_NUM;
+	int check;
+	check = semas[sem_num]->buffer;
+	check = check + 1;
 	
+	if(check > m->SEM_INIT_START_VALUE){
 	//check if semaphore exists
+		return EINVAL;
+	}
 
 	if(semas[sem_num]->init == 0){
 		return EINVAL;
@@ -98,8 +104,8 @@ int do_sem_up(message *m){
 		message mess;
 		// mess.m_type = OK;
 		mess.m_source = deq(semas[sem_num]->q);
-		// sendnb(mess.m_source, &mess);
-		do_sem_down(m);
+		send(mess.m_source, &mess);
+		//do_sem_down(m);
 	}
 
 	return OK;
