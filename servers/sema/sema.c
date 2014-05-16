@@ -29,6 +29,7 @@ void load_semas(int prevSize, int ArraySize){
 
 
 int do_sem_init(message *m){
+	printf("its aliveeeeeeee\n");
 	int i;
 	
 	if(m->SEM_INIT_START_VALUE < 0){
@@ -60,6 +61,7 @@ int do_sem_init(message *m){
 }
 
 int do_sem_down(message *m){
+	printf("rdown semaphore down\n");
 	int sem_num = m->SEM_DOWN_SEM_NUM;
 
 	if(semas[sem_num]->init == 0){
@@ -80,6 +82,7 @@ int do_sem_down(message *m){
 }
 
 int do_sem_up(message *m){
+	printf("sem up dawg\n");
 	int sem_num = m->SEM_DOWN_SEM_NUM;
 	
 	//check if semaphore exists
@@ -104,6 +107,8 @@ int do_sem_up(message *m){
 
 
 int do_sem_release(message *m){
+	printf("release semaphoreeann\n");
+
 	int sem_rel = m->SEM_RELEASE_SEMAPHORE;
 
 	if(semas[sem_rel]->init == 0){
