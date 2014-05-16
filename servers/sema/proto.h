@@ -1,4 +1,7 @@
 /* Function prototypes. */
+struct que;
+struct process;
+struct semaphore;
 
 struct schedproc;
 #include <timers.h>
@@ -19,3 +22,10 @@ int no_sys(int who_e, int call_nr);
 int sched_isokendpt(int ep, int *proc);
 int sched_isemtyendpt(int ep, int *proc);
 int accept_message(message *m_ptr);
+
+/* queue.c */
+struct que* make_que();
+endpoint_t deq(struct que* q);
+void enq(struct que* q, int proc);
+void empty_que(struct que* q);
+int que_size(struct que* q);
