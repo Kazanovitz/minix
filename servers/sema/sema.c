@@ -22,7 +22,7 @@ struct Semaphore *semas[ArraySize];
 void load_semas(int prevSize, int ArraySize){	
 	for(k=prevSize; k<ArraySize; k++){ //need prev size so you don't overwrite the first batch of Semas
 		semas[k] = (struct Semaphore*) malloc(sizeof(struct Semaphore));
-		semas[k]->q = init_queue();
+		semas[k]->q = make_queue();
 		semas[k]->init = 0;
 	}
 }
