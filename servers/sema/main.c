@@ -47,6 +47,7 @@ int main(void)
 
 	/* This is SCHED's main loop - get work and do it, forever and forever. */
 	while (TRUE) {
+		printf("Entered While:\n");
 		int ipc_status;
 
 		/* Wait for the next message and extract useful information from it. */
@@ -81,6 +82,9 @@ int main(void)
 		case SEM_RELEASE:
 			result = do_sem_release(&m_in);
 			break;
+
+		default:
+		printf("Default of Switch\n");
 
 		}
 
