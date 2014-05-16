@@ -37,7 +37,7 @@ int main(void)
 	int prevSize = 0;
 	int ArraySize = 1000;
 
-	printf("Semafor service is a running");
+	printf("Semafor service is a running\n");
 	/* SEF local startup. */
 	sef_startup();
 
