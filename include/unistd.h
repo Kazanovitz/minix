@@ -146,12 +146,6 @@ __aconst char *ttyname(int);
 int	 unlink(const char *);
 ssize_t	 write(int, const void *, size_t);
 
-/* SEMAPHORE DEclarationes */
-int sem_init(int start_value);
-int sem_down(int semaphore_number);
-int sem_up( int semaphore_number);
-int sem_release(int semaphore);
-
 
 
 /*

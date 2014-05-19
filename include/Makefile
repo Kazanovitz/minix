@@ -29,6 +29,8 @@ INCS+=	protocols/dumprestore.h protocols/routed.h protocols/rwhod.h \
 
 INCS+=	hesiod.h
 
+INCS+= sema.h
+
 INCS+=	rpcsvc/yp_prot.h rpcsvc/ypclnt.h
 
 INCS+=  ssp/ssp.h ssp/stdio.h ssp/string.h ssp/strings.h ssp/unistd.h
